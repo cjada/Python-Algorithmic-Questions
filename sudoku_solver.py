@@ -82,13 +82,13 @@ class Sudoku_solver(object):
 		for i in range(0, self.size):
 			for j in range(0, self.size):
 				if arr[i][j] == 0:
-					return (i, j, False)
-		return (-1, -1, True)
+					return (i, j)
 	
 	def solver(self, arr):
-		i, j, solved = self.find_zero(arr)
-		if solved:
+		if self.isValid(arr):
 			return True
+
+		i, j = self.find_zero(arr)
 		for num in range(1, 10):
 			if self.isSafe(arr, num, i, j):
 				arr[i][j] = num
@@ -156,7 +156,7 @@ grid=[[3,0,6,5,0,8,4,0,0],
 
 solver = Sudoku_solver(c)
 
-solver.findSolution(c)
+print(solver.findSolution(c) == generator.generate(h2))
 
 
 
