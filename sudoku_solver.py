@@ -1,5 +1,9 @@
 from tkinter import Tk, Canvas, Frame, Button, BOTH, TOP, BOTTOM
 
+MARGIN = 20  # Pixels around the board
+SIDE = 50  # Width of every board cell.
+WIDTH = HEIGHT = MARGIN * 2 + SIDE * 9
+
 class Sudoku_UI(Frame):
 	"""
 	The UI for drawing the board and accepting user input.
@@ -9,7 +13,7 @@ class Sudoku_UI(Frame):
 		self.parent = parent
 		Frame.__init__(self, parent)
 
-		self.row, self.column = 0, 0
+		self.row, self.col = 0, 0
 
 		self.__initUI()
 
@@ -55,7 +59,7 @@ class Sudoku_UI(Frame):
 					x = MARGIN + j * SIDE + SIDE / 2
 					y = MARGIN + i * SIDE + SIDE / 2
 					original = self.game.start_puzzle[i][j]
-					color = "black" if answer == original else "sea green"
+					color = "black" #if answer == original else "sea green"
 					self.canvas.create_text(
 						x, y, text=answer, tags="numbers", fill=color
 					)
@@ -73,9 +77,9 @@ class Sudoku_UI(Frame):
 		if (MARGIN < x < WIDTH - MARGIN and MARGIN < y < HEIGHT - MARGIN):
 			self.canvas.focus_set()
 
-			row, col = (y - MARGIN) / SIDE, (x - MARGIN) / SIDE
+			row, col = (y - MARGIN) // SIDE, (x - MARGIN) // SIDE
 
-			if (row, col) = (self.row, self.col):
+			if (row, col) == (self.row, self.col):
 				self.row, self.col = -1, -1
 			elif self.game.puzzle[row][col] == 0:
 				self.row, self.col = row, col
@@ -95,9 +99,9 @@ class Sudoku_UI(Frame):
 			)
 
 	def __key_pressed(self, event):
-		if self.game.gmae_over:
+		if self.game.game_over:
 			return
-		if self.row >= 0 and self.col >= and event.char in "1234567890":
+		if self.row >= 0 and self.col >= 0 and event.char in "1234567890":
 			self.game.puzzle[self.row][self.col] = int(event.char)
 			self.col, self.row = -1, -1
 			self.__draw_puzzle()
@@ -113,12 +117,22 @@ class Sudoku_UI(Frame):
 
 
 
-class Sudoku_solver(object):
-	"""docstring for Sudoku_solver"""
+class Sudoku_solver():
+	puzzle = [[3,0,6,5,0,8,4,0,0], 
+		[5,2,0,0,0,0,0,0,0], 
+		[0,8,7,0,0,0,0,3,1], 
+		[0,0,3,0,1,0,0,8,0], 
+		[9,0,0,8,6,3,0,0,5], 
+		[0,5,0,0,9,0,6,0,0], 
+		[1,3,0,0,0,0,2,5,0], 
+		[0,0,0,0,0,0,0,7,4], 
+		[0,0,5,2,0,6,3,0,0]]
+	start_puzzle = puzzle
+	game_over = False
 	def __init__(self, arg):
-		super(Sudoku_solver, self).__init__()
 		#self.S = arg
 		self.size = 9
+		
 
 	def determineSquare(self, i, j):
 		# determine the 3x3 Matrix parameters for any given 9x9 indices
@@ -272,6 +286,17 @@ grid=[[3,0,6,5,0,8,4,0,0],
 solver = Sudoku_solver(c)
 
 print(solver.findSolution(c) == generator.generate(h2))
+
+if __name__ == '__main__':
+
+	root = Tk()
+
+	game = Sudoku_solver(c)
+
+	Sudoku_UI(root, Sudoku_solver)
+	root.geometry("%dx%d" % (WIDTH, HEIGHT + 40))
+	root.mainloop()
+
 
 
 
