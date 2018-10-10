@@ -22,8 +22,8 @@ class Sudoku_UI(Frame):
 		self.pack(fill=BOTH, expand=1)
 		self.canvas = Canvas(self, width=WIDTH, height=HEIGHT)
 		self.canvas.pack(fill=BOTH, side=TOP)
-		clear_button = Button(self, text="Clear answers", command=self.__clear_answers)
-		clear_button.pack(fill=BOTH, side=BOTTOM)
+		submit_button = Button(self, text="Submit puzzle", command=self.__submit_puzzle)
+		submit_button.pack(fill=BOTH, side=BOTTOM)
 
 		self.__draw_grid()
 		self.__draw_puzzle()
@@ -54,7 +54,7 @@ class Sudoku_UI(Frame):
 		self.canvas.delete("numbers")
 		for i in range(9):
 			for j in range(9):
-				answer = self.game.puzzle[i][j]
+				answer = self.game.puzzle[i][j]				# !!!!
 				if answer != 0:
 					x = MARGIN + j * SIDE + SIDE / 2
 					y = MARGIN + i * SIDE + SIDE / 2
@@ -64,10 +64,10 @@ class Sudoku_UI(Frame):
 						x, y, text=answer, tags="numbers", fill=color
 					)
 
-	def __clear_answers(self):
-		self.game.start()
-		self.canvas.delete("victory")
-		self.__draw_puzzle()
+	def __submit_puzzle(self):
+		self.game.start(game)
+		#self.canvas.delete("victory") // Don't know the effect of this yet
+		#self.__draw_puzzle()
 
 	def __cell_clicked(self, event):
 		if self.game.game_over:
@@ -116,24 +116,7 @@ class Sudoku_UI(Frame):
 
 
 
-
 class Sudoku_solver():
-	puzzle = [[3,0,6,5,0,8,4,0,0], 
-		[5,2,0,0,0,0,0,0,0], 
-		[0,8,7,0,0,0,0,3,1], 
-		[0,0,3,0,1,0,0,8,0], 
-		[9,0,0,8,6,3,0,0,5], 
-		[0,5,0,0,9,0,6,0,0], 
-		[1,3,0,0,0,0,2,5,0], 
-		[0,0,0,0,0,0,0,7,4], 
-		[0,0,5,2,0,6,3,0,0]]
-	start_puzzle = puzzle
-	game_over = False
-	def __init__(self, arg):
-		#self.S = arg
-		self.size = 9
-		
-
 	def determineSquare(self, i, j):
 		# determine the 3x3 Matrix parameters for any given 9x9 indices
 		# Return an array with the 3x3 limits
@@ -171,8 +154,8 @@ class Sudoku_solver():
 		"""
 		Returns True if the sudoku puzzle is solved
 		"""
-		for i in range(0, self.size):
-			for j in range(0, self.size):
+		for i in range(0, 9):
+			for j in range(0, 9):
 				if arr[i][j] == 0:
 					return False
 				if not self.isSafe(arr, arr[i][j], i, j):
@@ -184,21 +167,17 @@ class Sudoku_solver():
 		# i, j: Int - these are the Sudoku puzzle (S) indices
 
 		# Check columns
-		for j1 in range(0, self.size):
+		for j1 in range(0, 9):
 			if j1 != j and arr[i][j1] == num:
-				#print("column" + str(num))
 				return False
 
 		# Check rows
-		for i1 in range(0, self.size):
+		for i1 in range(0, 9):
 			if i1 != i and arr[i1][j] == num:
-				#print("row" + str(num))
 				return False
 
 		# Check 3x3 square
 		x1, x2, y1, y2 = self.determineSquare(i, j)
-
-
 		for i1 in range(y1, y2):
 			for j1 in range(x1, x2):
 				if j1 != j and i1 != i and arr[i1][j1] == num:
@@ -206,10 +185,9 @@ class Sudoku_solver():
 
 		return True
 
-
 	def find_zero(self, arr):
-		for i in range(0, self.size):
-			for j in range(0, self.size):
+		for i in range(0, 9):
+			for j in range(0, 9):
 				if arr[i][j] == 0:
 					return (i, j)
 	
@@ -227,68 +205,68 @@ class Sudoku_solver():
 		return False
 
 
-	def findSolution(self, arr):
-		solved, arr = self.solver(arr)
+	def findSolution(self, puzzle):
+		solved, puzzle = self.solver(puzzle)
 		if solved:
-			self.S = arr
-			for l in self.S:
+			for l in puzzle:
 				print(l)
 			print("SOLVED")
-			return self.S
+			return puzzle
 		else:
 			print("This cannot be solved")
 			return False
 
 
-
-class sudoku_matrix_generator(object):
+class test():
 	def generate(self, s):
 		s = s.replace(".", "0")
 		i = 1
-		l = []
-		a = []
+		row = []
+		matrix = []
 		for digit in s:
-			l.append(int(digit))
+			row.append(int(digit))
 			if i >= 9:
-				a.append(l)
-				l = []
+				matrix.append(row)
+				row = []
 				i = 0
 			i += 1
-		return a
+		return matrix
+
+	"""
+	Takes in two string arguments, runs the sudoku solver, and determines whether the solver is correct
+
+	puzzle, answer: string, string (or bool)
+	return: bool
+	"""
+	def evaluate(self, puzzle, answer):
+		solver = Sudoku_solver()
+		puzzle = self.generate(puzzle)
+
+		if answer != False:
+			answer = self.generate(answer)
+
+		return solver.findSolution(puzzle) == answer
 
 
 
-
-
-
-
-s = "974236158638091742125487936316754289742908563589362417867125394253649871491073625"
-s2= "123456789913456789223456789323456789423456879523456789623456789723456789823456789"
-s3 = "3.542.81.4879.15.6.29.5637485.793.416132.8957.74.6528.2413.9.655.867.192.965124.8"
-d3 = "365427819487931526129856374852793641613248957974165283241389765538674192796512438"
-h1 = "..2.3...8.....8....31.2.....6..5.27..1.....5.2.4.6..31....8.6.5.......13..531.4.."
-h2 = "672435198549178362831629547368951274917243856254867931193784625486592713725316489"
-
-invalid = "...........5....9...4....1.2....3.5....7.....438...2......9.....1.4...6.........."
-generator = sudoku_matrix_generator()
-
-c = generator.generate(h1)
-grid=[[3,0,6,5,0,8,4,0,0], 
-		[5,2,0,0,0,0,0,0,0], 
-		[0,8,7,0,0,0,0,3,1], 
-		[0,0,3,0,1,0,0,8,0], 
-		[9,0,0,8,6,3,0,0,5], 
-		[0,5,0,0,9,0,6,0,0], 
-		[1,3,0,0,0,0,2,5,0], 
-		[0,0,0,0,0,0,0,7,4], 
-		[0,0,5,2,0,6,3,0,0]]
-
-solver = Sudoku_solver(c)
-
-print(solver.findSolution(c) == generator.generate(h2))
 
 if __name__ == '__main__':
+	s = "974236158638091742125487936316754289742908563589362417867125394253649871491073625"
+	a = "123456789913456789223456789323456789423456879523456789623456789723456789823456789"
+	s2 = "3.542.81.4879.15.6.29.5637485.793.416132.8957.74.6528.2413.9.655.867.192.965124.8"
+	a2 = "365427819487931526129856374852793641613248957974165283241389765538674192796512438"
+	h1 = "..2.3...8.....8....31.2.....6..5.27..1.....5.2.4.6..31....8.6.5.......13..531.4.."
+	h2 = "672435198549178362831629547368951274917243856254867931193784625486592713725316489"
+	invalid = "...........5....9...4....1.2....3.5....7.....438...2......9.....1.4...6.........."
 
+	t = test()
+	print(1, t.evaluate(s, a))
+	print(2, t.evaluate(s2, a2))
+	print(3, t.evaluate(h1, h2))
+	print(4, t.evaluate(invalid, False))
+
+
+	"""
 	root = Tk()
 
 	game = Sudoku_solver(c)
@@ -296,7 +274,7 @@ if __name__ == '__main__':
 	Sudoku_UI(root, Sudoku_solver)
 	root.geometry("%dx%d" % (WIDTH, HEIGHT + 40))
 	root.mainloop()
-
+	"""
 
 
 
