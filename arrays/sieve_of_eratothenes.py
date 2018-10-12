@@ -3,14 +3,20 @@ Return the primes contained in a range defined by n.
 """
 
 def find_primes(n):
-	primes_list = [i for i in range(2, n + 1)]
+	primes = [True for i in range(n + 1)]
+	p = 2
+	primes[0] = primes[1] = False
+	while (p * p) <= n:
+		if primes[p]:
 
-	for num in primes_list:
-		p = 2
-		while (num * p) < (n + 1):
-			if (num * p) in primes_list:
-				primes_list.remove(num * p)
-			p += 1
+			for i in range(p * 2, n + 1, p):
+				primes[i] = False
 
-	return primes_list
+		p += 1
 
+	for p in range(2, n+1):
+		if primes[p]:
+			print(p)
+
+
+print(find_primes(25))
