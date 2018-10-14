@@ -263,6 +263,8 @@ if __name__ == '__main__':
 	print(1, t.evaluate(s, a))
 	print(2, t.evaluate(s2, a2))
 	print(3, t.evaluate(h1, h2))
+
+	# !!!! This case is failing.  Need to make it quicker.
 	print(4, t.evaluate(invalid, False))
 
 
